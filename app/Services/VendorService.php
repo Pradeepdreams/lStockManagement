@@ -186,14 +186,14 @@ class VendorService
                     'bank_name',
                     'bank_branch_name',
                     'upi_id',
-                    'transport_facility_provided',
-                    'remarks'
+                    // 'transport_facility_provided',
+                    // 'remarks'
                 ]));
 
-                $vendorData['referred_source_id'] = $vendorReferredSource->id ?? null;
+                // $vendorData['referred_source_id'] = $vendorReferredSource->id ?? null;
                 $vendorData['created_by'] = $userId;
                 $vendorData['gst_applicable'] = $request->gst_applicable == "yes" ? true : false;
-                $vendorData['transport_facility_provided'] = $request->gst_applicable == "yes" ? true : false;
+                // $vendorData['transport_facility_provided'] = $request->gst_applicable == "yes" ? true : false;
                 $vendorData['gst_applicable_from'] = $request->gst_applicable_from != ""
                     ? Carbon::parse($request->gst_applicable_from)->format('Y-m-d')
                     : null;
@@ -213,44 +213,44 @@ class VendorService
                 $referredSourceType = $request->referred_source_type;
                 $referredSourceId = $request->referred_source_id;
 
-                if ($existingVendor->referred_source_type !== $referredSourceType || $existingVendor->referred_source_id != $referredSourceId) {
+                // if ($existingVendor->referred_source_type !== $referredSourceType || $existingVendor->referred_source_id != $referredSourceId) {
 
-                    $existingVendor->referredSource()->delete();
-                    logActivity('Deleted referred source', $existingVendor, [$existingVendor->referredSource]);
+                //     $existingVendor->referredSource()->delete();
+                //     logActivity('Deleted referred source', $existingVendor, [$existingVendor->referredSource]);
 
-                    $referredSourceData = [
-                        'agent_id' => null,
-                        'user_id' => null,
-                        'vendor_id' => null,
-                        'social_media_id' => null,
-                        'others' => null,
-                    ];
+                //     $referredSourceData = [
+                //         'agent_id' => null,
+                //         'user_id' => null,
+                //         'vendor_id' => null,
+                //         'social_media_id' => null,
+                //         'others' => null,
+                //     ];
 
-                    switch ($referredSourceType) {
-                        case 'agent':
-                            $referredSourceData['agent_id'] = $referredSourceId;
-                            break;
-                        case 'user':
-                            $referredSourceData['user_id'] = $referredSourceId;
-                            break;
-                        case 'vendor':
-                            $referredSourceData['vendor_id'] = $referredSourceId;
-                            break;
-                        case 'social_media':
-                            $referredSourceData['social_media_id'] = $referredSourceId;
-                            break;
-                        case 'others':
-                            $referredSourceData['others'] = $request->others;
-                            break;
-                        default:
-                            // throw new Exception("Invalid referred_source_type provided.");
-                    }
+                //     switch ($referredSourceType) {
+                //         case 'agent':
+                //             $referredSourceData['agent_id'] = $referredSourceId;
+                //             break;
+                //         case 'user':
+                //             $referredSourceData['user_id'] = $referredSourceId;
+                //             break;
+                //         case 'vendor':
+                //             $referredSourceData['vendor_id'] = $referredSourceId;
+                //             break;
+                //         case 'social_media':
+                //             $referredSourceData['social_media_id'] = $referredSourceId;
+                //             break;
+                //         case 'others':
+                //             $referredSourceData['others'] = $request->others;
+                //             break;
+                //         default:
+                //             // throw new Exception("Invalid referred_source_type provided.");
+                //     }
 
-                    $vendorReferredSource = VendorReferredSource::create($referredSourceData);
-                    $existingVendor->update(['referred_source_id' => $vendorReferredSource->id]);
+                //     $vendorReferredSource = VendorReferredSource::create($referredSourceData);
+                //     $existingVendor->update(['referred_source_id' => $vendorReferredSource->id]);
 
-                    logActivity('Created referred source', $existingVendor, [$vendorReferredSource]);
-                }
+                //     logActivity('Created referred source', $existingVendor, [$vendorReferredSource]);
+                // }
 
 
                 if ($request->has('vendor_contact_details')) {
@@ -269,11 +269,11 @@ class VendorService
                     }
                 }
 
-                if ($request->has('items')) {
-                    $existingVendor->items()->sync($request->items);
-                }
+                // if ($request->has('items')) {
+                //     $existingVendor->items()->sync($request->items);
+                // }
 
-                return $existingVendor->load(['vendorContactDetails', 'items', 'vendorUpi']);
+                return $existingVendor->load(['vendorContactDetails', 'vendorUpi']);
             }
 
             $vendorData = array_map(function ($value) {
@@ -305,49 +305,49 @@ class VendorService
                 'bank_name',
                 'bank_branch_name',
                 'upi_id',
-                'transport_facility_provided',
-                'remarks'
+                // 'transport_facility_provided',
+                // 'remarks'
             ]));
 
-            $referredSourceType = $request->referred_source_type;
-            $vendorData['referred_source_type'] = $referredSourceType;
+            // $referredSourceType = $request->referred_source_type;
+            // $vendorData['referred_source_type'] = $referredSourceType;
 
-            if ($referredSourceType != 'MD') {
-                $referredSourceData = [
-                    'agent_id' => null,
-                    'user_id' => null,
-                    'vendor_id' => null,
-                    'social_media_id' => null,
-                    'others' => null,
-                ];
+            // if ($referredSourceType != 'MD') {
+            //     $referredSourceData = [
+            //         'agent_id' => null,
+            //         'user_id' => null,
+            //         'vendor_id' => null,
+            //         'social_media_id' => null,
+            //         'others' => null,
+            //     ];
 
-                switch ($referredSourceType) {
-                    case 'agent':
-                        $referredSourceData['agent_id'] = $request->referred_source_id;
-                        break;
-                    case 'user':
-                        $referredSourceData['user_id'] = $request->referred_source_id;
-                        break;
-                    case 'vendor':
-                        $referredSourceData['vendor_id'] = $request->referred_source_id;
-                        break;
-                    case 'social_media':
-                        $referredSourceData['social_media_id'] = $request->referred_source_id;
-                        break;
-                    case 'others':
-                        $referredSourceData['others'] = $request->referred_source_id;
-                        break;
-                    default:
-                        // throw new Exception("Invalid referred_source_type provided.");
-                }
+            //     switch ($referredSourceType) {
+            //         case 'agent':
+            //             $referredSourceData['agent_id'] = $request->referred_source_id;
+            //             break;
+            //         case 'user':
+            //             $referredSourceData['user_id'] = $request->referred_source_id;
+            //             break;
+            //         case 'vendor':
+            //             $referredSourceData['vendor_id'] = $request->referred_source_id;
+            //             break;
+            //         case 'social_media':
+            //             $referredSourceData['social_media_id'] = $request->referred_source_id;
+            //             break;
+            //         case 'others':
+            //             $referredSourceData['others'] = $request->referred_source_id;
+            //             break;
+            //         default:
+            //             // throw new Exception("Invalid referred_source_type provided.");
+            //     }
 
-                $vendorReferredSource = VendorReferredSource::create($referredSourceData);
-            }
+            //     $vendorReferredSource = VendorReferredSource::create($referredSourceData);
+            // }
 
-            $vendorData['referred_source_id'] = $vendorReferredSource->id ?? null;
+            // $vendorData['referred_source_id'] = $vendorReferredSource->id ?? null;
             $vendorData['created_by'] = $userId;
             $vendorData['gst_applicable'] = $request->gst_applicable == "yes" ? true : false;
-            $vendorData['transport_facility_provided'] = $request->gst_applicable == "yes" ? true : false;
+            // $vendorData['transport_facility_provided'] = $request->gst_applicable == "yes" ? true : false;
             $vendorData['gst_applicable_from'] = $request->gst_applicable_from != ""
                 ? Carbon::parse($request->gst_applicable_from)->format('Y-m-d')
                 : null;
@@ -380,11 +380,11 @@ class VendorService
                 }
             }
 
-            if ($request->has('items')) {
-                $vendor->items()->sync($request->items);
-            }
+            // if ($request->has('items')) {
+            //     $vendor->items()->sync($request->items);
+            // }
 
-            return $vendor->load(['vendorContactDetails', 'items', 'vendorUpi']);
+            return $vendor->load(['vendorContactDetails', 'vendorUpi']);
         });
         // } catch (Exception $e) {
         //     throw new Exception("Failed to restore or create vendor: " . $e->getMessage());
@@ -446,8 +446,8 @@ class VendorService
                     'ifsc_code' => $request->ifsc_code,
                     'bank_name' => $request->bank_name,
                     'bank_branch_name' => $request->bank_branch_name,
-                    'transport_facility_provided' => $request->gst_applicable == "yes" ? true : false,
-                    'remarks' => $request->remarks,
+                    // 'transport_facility_provided' => $request->gst_applicable == "yes" ? true : false,
+                    // 'remarks' => $request->remarks,
                 ];
 
                 if ($vendorData['gst_applicable']) {
@@ -463,51 +463,51 @@ class VendorService
 
                 $vendor->update($vendorData);
 
-                $referredSourceType = $request->referred_source_type;
-                $referredSourceId = $request->referred_source_id;
+                // $referredSourceType = $request->referred_source_type;
+                // $referredSourceId = $request->referred_source_id;
 
-                if ($vendor->referred_source_type !== $referredSourceType) {
-                    if ($vendor->referredSource) {
-                        $vendor->referredSource()->delete();
-                        logActivity('Deleted referred source', $vendor, [$vendor->referredSource]);
-                    }
+                // if ($vendor->referred_source_type !== $referredSourceType) {
+                //     if ($vendor->referredSource) {
+                //         $vendor->referredSource()->delete();
+                //         logActivity('Deleted referred source', $vendor, [$vendor->referredSource]);
+                //     }
 
-                    $referredSourceData = [
-                        'agent_id' => null,
-                        'user_id' => null,
-                        'vendor_id' => null,
-                        'social_media_id' => null,
-                        'others' => null,
-                    ];
+                //     $referredSourceData = [
+                //         'agent_id' => null,
+                //         'user_id' => null,
+                //         'vendor_id' => null,
+                //         'social_media_id' => null,
+                //         'others' => null,
+                //     ];
 
-                    switch ($referredSourceType) {
-                        case 'agent':
-                            $referredSourceData['agent_id'] = $referredSourceId;
-                            break;
-                        case 'user':
-                            $referredSourceData['user_id'] = $referredSourceId;
-                            break;
-                        case 'vendor':
-                            $referredSourceData['vendor_id'] = $referredSourceId;
-                            break;
-                        case 'social_media':
-                            $referredSourceData['social_media_id'] = $referredSourceId;
-                            break;
-                        case 'others':
-                            $referredSourceData['others'] = $request->others;
-                            break;
-                        default:
-                            throw new Exception("Invalid referred_source_type provided.");
-                    }
+                //     switch ($referredSourceType) {
+                //         case 'agent':
+                //             $referredSourceData['agent_id'] = $referredSourceId;
+                //             break;
+                //         case 'user':
+                //             $referredSourceData['user_id'] = $referredSourceId;
+                //             break;
+                //         case 'vendor':
+                //             $referredSourceData['vendor_id'] = $referredSourceId;
+                //             break;
+                //         case 'social_media':
+                //             $referredSourceData['social_media_id'] = $referredSourceId;
+                //             break;
+                //         case 'others':
+                //             $referredSourceData['others'] = $request->others;
+                //             break;
+                //         default:
+                //             throw new Exception("Invalid referred_source_type provided.");
+                //     }
 
-                    $vendorReferredSource = VendorReferredSource::create($referredSourceData);
-                    $vendor->update([
-                        'referred_source_type' => $referredSourceType,
-                        'referred_source_id' => $vendorReferredSource->id,
-                    ]);
+                //     $vendorReferredSource = VendorReferredSource::create($referredSourceData);
+                //     $vendor->update([
+                //         'referred_source_type' => $referredSourceType,
+                //         'referred_source_id' => $vendorReferredSource->id,
+                //     ]);
 
-                    logActivity('Created referred source', $vendor, [$vendorReferredSource]);
-                }
+                //     logActivity('Created referred source', $vendor, [$vendorReferredSource]);
+                // }
 
                 // Sync vendor contact details
                 if ($request->has('vendor_contact_details')) {
@@ -526,9 +526,9 @@ class VendorService
                 }
 
                 // Sync items
-                if ($request->has('items')) {
-                    $vendor->items()->sync($request->items);
-                }
+                // if ($request->has('items')) {
+                //     $vendor->items()->sync($request->items);
+                // }
 
                 logActivity('Updated', $vendor, [$changes]);
 

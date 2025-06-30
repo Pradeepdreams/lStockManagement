@@ -169,9 +169,9 @@ class VendorRequest extends FormRequest
             'vendor_contact_details.*.name.string' => 'Each contact name must be a string.',
             'vendor_contact_details.*.phone_no.string' => 'Each contact phone number must be a string.',
             'vendor_contact_details.*.email.email' => 'Each contact email must be a valid email address.',
-            'items.array' => 'Items must be an array.',
-            'items.*.integer' => 'Each item must be a valid integer.',
-            'items.*.exists' => 'One or more selected items do not exist.',
+            // 'items.array' => 'Items must be an array.',
+            // 'items.*.integer' => 'Each item must be a valid integer.',
+            // 'items.*.exists' => 'One or more selected items do not exist.',
         ];
     }
 }

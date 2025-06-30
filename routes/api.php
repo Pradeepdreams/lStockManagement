@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\Admin\Customer\CustomerController;
 use App\Http\Controllers\Admin\Employee\EmployeeController;
 use App\Http\Controllers\Admin\Masters\AgentController;
 use App\Http\Controllers\Admin\Masters\CityController;
@@ -209,4 +210,8 @@ Route::middleware(['auth:sanctum', SetUserBranch::class])->group(function () {
 
     // Barcode details
     Route::get('/barcode-details/{barcode}', [StockItemController::class, 'getByBarcode']);
+
+    // Customer
+    Route::get('customers/list', [CustomerController::class, 'list']);
+    Route::apiResource('customers', CustomerController::class);
 });

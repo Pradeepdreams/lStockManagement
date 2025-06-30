@@ -17,12 +17,12 @@ class Category extends Model
     protected $fillable = [
         'name',
         'description',
-        'margin_percent_from',
-        'margin_percent_to',
+        // 'margin_percent_from',
+        // 'margin_percent_to',
         // 'gst_percent',
         // 'applicable_date',
         // 'hsn_code',
-        'active_status'
+        // 'active_status'
     ];
 
 
@@ -37,40 +37,40 @@ class Category extends Model
         return $this->hasMany(Item::class);
     }
 
-    public function gst_percents()
-    {
-        return $this->hasMany(CategoryGstApplicable::class);
-    }
+    // public function gst_percents()
+    // {
+    //     return $this->hasMany(CategoryGstApplicable::class);
+    // }
 
-    public function hsn_codes()
-    {
-        return $this->hasMany(CategoryHsnApplicable::class);
-    }
+    // public function hsn_codes()
+    // {
+    //     return $this->hasMany(CategoryHsnApplicable::class);
+    // }
 
-    public function latestGstPercent()
-    {
-        return $this->hasOne(CategoryGstApplicable::class, 'category_id')->latestOfMany('created_at');
-        // return $this->hasOne(CategoryGstApplicable::class, 'category_id')->latestOfMany('applicable_date');
-    }
+    // public function latestGstPercent()
+    // {
+    //     return $this->hasOne(CategoryGstApplicable::class, 'category_id')->latestOfMany('created_at');
+    //     // return $this->hasOne(CategoryGstApplicable::class, 'category_id')->latestOfMany('applicable_date');
+    // }
 
-    public function latestHsnCode()
-    {
-        return $this->hasOne(CategoryHsnApplicable::class, 'category_id')->latestOfMany('created_at');
-        // return $this->hasOne(CategoryHsnApplicable::class, 'category_id')->latestOfMany('applicable_date');
-    }
+    // public function latestHsnCode()
+    // {
+    //     return $this->hasOne(CategoryHsnApplicable::class, 'category_id')->latestOfMany('created_at');
+    //     // return $this->hasOne(CategoryHsnApplicable::class, 'category_id')->latestOfMany('applicable_date');
+    // }
 
 
-    public function activeGstPercent()
-    {
-        return $this->hasOne(CategoryGstApplicable::class, 'category_id')
-            ->where('applicable_date', '<=', Carbon::now()->format('Y-m-d'))
-            ->orderByDesc('applicable_date');
-    }
+    // public function activeGstPercent()
+    // {
+    //     return $this->hasOne(CategoryGstApplicable::class, 'category_id')
+    //         ->where('applicable_date', '<=', Carbon::now()->format('Y-m-d'))
+    //         ->orderByDesc('applicable_date');
+    // }
 
-    public function activeHsnCode()
-    {
-        return $this->hasOne(CategoryHsnApplicable::class, 'category_id')
-            ->where('applicable_date', '<=', Carbon::now()->format('Y-m-d'))
-            ->orderByDesc('applicable_date');
-    }
+    // public function activeHsnCode()
+    // {
+    //     return $this->hasOne(CategoryHsnApplicable::class, 'category_id')
+    //         ->where('applicable_date', '<=', Carbon::now()->format('Y-m-d'))
+    //         ->orderByDesc('applicable_date');
+    // }
 }

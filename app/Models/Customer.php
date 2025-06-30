@@ -7,21 +7,26 @@ use App\Traits\LogModelChangesTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CategoryHsnApplicable extends Model
+class Customer extends Model
 {
     use HasFactory, EncryptableIdTrait, LogModelChangesTrait;
 
     protected $appends = ['id_crypt'];
 
-
     protected $fillable = [
-        'item_id',
-        'hsn_code',
-        'applicable_date',
+        'name',
+        'type',
+        'email',
+        'phone',
+        'address_line1',
+        'address_line2',
+        'city',
+        'state',
+        'country',
+        'pincode',
+        'gst_number',
+        'pan_number',
+        'credit_limit',
+        'customer_group',
     ];
-
-    public function items()
-    {
-        return $this->belongsTo(Item::class);
-    }
 }

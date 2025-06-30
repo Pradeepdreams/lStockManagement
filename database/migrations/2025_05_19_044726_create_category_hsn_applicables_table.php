@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('category_hsn_applicables', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
+            $table->foreignId('item_id')->constrained('items')->onDelete('cascade');
             $table->integer('hsn_code')->nullable();
             $table->date('applicable_date')->nullable();
             $table->timestamps();

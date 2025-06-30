@@ -4,10 +4,13 @@ namespace App\Services\Masters;
 
 use App\Http\Requests\Masters\ItemRequest;
 use App\Models\AttributeCategory;
+use App\Models\CategoryGstApplicable;
+use App\Models\CategoryHsnApplicable;
 use App\Models\Item;
 use App\Models\ItemCategoryAttributeValue;
 use App\Models\PurchaseOrderItem;
 use Attribute;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Exception;
 use Illuminate\Support\Facades\Crypt;
@@ -29,11 +32,12 @@ class ItemService
         }
 
         $items = $itemQuery->with([
-            'category.activeGstPercent',
-            'category.activeHsnCode',
-            'itemCategoryAttributeValues.attributeCategory.attribute',
-            'itemCategoryAttributeValues.attributeCategory.category',
-            'itemCategoryAttributeValues.attributeValue'
+            'category',
+            'activeGstPercent',
+            'activeHsnCode',
+            'latestGstPercent',
+            'latestHsnCode'
+
         ])->latest()->paginate(10);
         $getLinks = $items->jsonSerialize();
 
@@ -65,29 +69,32 @@ class ItemService
 
                 $validated['item_code'] = $this->generateItemCode();
 
-                $attributes = $validated['attributes'] ?? null;
-                unset($validated['attributes']);
-
                 $item = Item::create($validated);
 
                 // Log activity
                 logActivity('Created', $item, [$item]);
+                $gstApplicable = [
+                    "item_id" => $item->id,
+                    "gst_percent" => $request['gst_percent'],
+                    "applicable_date" => isset($request['gst_applicable_date'])
+                        ? Carbon::parse($request['gst_applicable_date'])->format('Y-m-d')
+                        : null
+                ];
 
-                // Optional: Insert attributes if provided
-                if ($attributes && is_array($attributes)) {
-                    foreach ($attributes as $attribute) {
-                        $attributeCategory = AttributeCategory::where('category_id', $request->category_id)
-                            ->where('attribute_id', $attribute['attribute_id'])->first();
+                $gstCreate = CategoryGstApplicable::create($gstApplicable);
 
-                        if ($attributeCategory) {
-                            ItemCategoryAttributeValue::create([
-                                'item_id' => $item->id,
-                                'attribute_category_id' => $attributeCategory->id,
-                                'attribute_value_id' => $attribute['attribute_value_id'],
-                            ]);
-                        }
-                    }
-                }
+                $hsnApplicable = [
+                    "item_id" => $item->id,
+                    "hsn_code" => $request['hsn_code'],
+                    "applicable_date" => isset($request['hsn_applicable_date'])
+                        ? Carbon::parse($request['hsn_applicable_date'])->format('Y-m-d')
+                        : null
+                ];
+
+                $hsnCreate = CategoryHsnApplicable::create($hsnApplicable);
+
+
+
                 return $item;
             });
         } catch (Exception $e) {
@@ -104,10 +111,9 @@ class ItemService
         $id = Crypt::decryptString($encryptedId);
 
         $item = Item::with([
-            'category.activeGstPercent',
-            'category.activeHsnCode',
-            'category.attributes.attribute_values',
-
+            'category',
+            'latestGstPercent',
+            'latestHsnCode',
         ])->findOrFail($id);
 
         // return $item;
@@ -132,50 +138,43 @@ class ItemService
         ]);
     }
 
-    public function update(ItemRequest $request, string $encryptedId)
+    public function update(ItemRequest $request, $id)
     {
-        abort_unless(auth()->user()->hasBranchPermission('update_item'), 403, 'Unauthorized');
+        abort_unless(auth()->user()->hasBranchPermission('edit_item'), 403, 'Unauthorized');
 
         try {
-            return DB::transaction(function () use ($request, $encryptedId) {
-                $id = Crypt::decryptString($encryptedId);
-                $item = Item::with('category')->findOrFail($id);
-
-                if (PurchaseOrderItem::where('item_id', $item->id)->exists()) {
-                    throw new \Exception('Item is used in purchase order. Can\'t be updated.');
-                }
-
+            return DB::transaction(function () use ($request, $id) {
                 $validated = $request->validated();
 
-                if (isset($validated['item_code']) && $validated['item_code'] !== $item->item_code) {
-                    throw new \Exception('item_code cannot be modified.');
-                }
+                $id = Crypt::decryptString($id);
 
-                $attributes = $validated['attributes'] ?? null;
-                unset($validated['attributes'], $validated['item_code']);
-
-                $changes = $item->getChangedAttributesFromRequest($validated);
+                $item = Item::findOrFail($id);
                 $item->update($validated);
 
-                logActivity('Updated', $item, $changes);
+                // Log activity
+                logActivity('Updated', $item, [$item]);
 
-                if ($attributes && is_array($attributes)) {
+                // Always create new GST entry (not update)
+                $gstApplicable = [
+                    "item_id" => $item->id,
+                    "gst_percent" => $request['gst_percent'],
+                    "applicable_date" => isset($request['gst_applicable_date'])
+                        ? Carbon::parse($request['gst_applicable_date'])->format('Y-m-d')
+                        : null
+                ];
 
-                    ItemCategoryAttributeValue::where('item_id', $item->id)->delete();
+                CategoryGstApplicable::create($gstApplicable);
 
-                    foreach ($attributes as $attribute) {
-                        $attributeCategory = AttributeCategory::where('category_id', $request->category_id)
-                            ->where('attribute_id', $attribute['attribute_id'])->first();
+                // Always create new HSN entry (not update)
+                $hsnApplicable = [
+                    "item_id" => $item->id,
+                    "hsn_code" => $request['hsn_code'],
+                    "applicable_date" => isset($request['hsn_applicable_date'])
+                        ? Carbon::parse($request['hsn_applicable_date'])->format('Y-m-d')
+                        : null
+                ];
 
-                        if ($attributeCategory) {
-                            ItemCategoryAttributeValue::create([
-                                'item_id' => $item->id,
-                                'attribute_category_id' => $attributeCategory->id,
-                                'attribute_value_id' => $attribute['attribute_value_id'],
-                            ]);
-                        }
-                    }
-                }
+                CategoryHsnApplicable::create($hsnApplicable);
 
                 return $item;
             });
@@ -183,6 +182,7 @@ class ItemService
             throw new Exception("Failed to update item: " . $e->getMessage());
         }
     }
+
 
 
     public function destroy(string $encryptedId)

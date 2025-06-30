@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('item_name');
             $table->string('item_code')->unique();
             $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
-            $table->integer('margin_percent')->nullable();
+            $table->boolean('active_status')->default(true);
             $table->string('reorder_level')->nullable();
             $table->string('unit_of_measurement')->nullable();
             $table->timestamps();

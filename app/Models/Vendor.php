@@ -41,10 +41,10 @@ class Vendor extends Model
         'ifsc_code',
         'bank_name',
         'bank_branch_name',
-        'transport_facility_provided',
-        'remarks',
-        'referred_source_type',
-        'referred_source_id',
+        // 'transport_facility_provided',
+        // 'remarks',
+        // 'referred_source_type',
+        // 'referred_source_id',
         'created_by',
         'updated_by'
     ];

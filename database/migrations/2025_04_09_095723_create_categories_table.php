@@ -15,9 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->decimal('gst_percent', 5, 2)->nullable();
-            $table->string('hsn_code')->nullable();
-            $table->boolean('active_status')->default(true);
             $table->timestamps();
         });
     }

@@ -9,21 +9,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class CategoryGstApplicable extends Model
 {
-     use HasFactory, EncryptableIdTrait, LogModelChangesTrait;
+    use HasFactory, EncryptableIdTrait, LogModelChangesTrait;
 
     protected $appends = ['id_crypt'];
 
 
     protected $fillable = [
-        'category_id',
+        'item_id',
         'gst_percent',
         'applicable_date',
     ];
 
 
-    public function category()
+    public function items()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Item::class);
     }
-
 }
