@@ -76,14 +76,14 @@ class PurchaseOrderService
                 'date' => Carbon::parse($request->date)->format('Y-m-d'),
                 'area_id' => $request->area_id,
                 'vendor_id' => $request->vendor_id,
-                'payment_terms_id' => $request->payment_terms_id,
+                // 'payment_terms_id' => $request->payment_terms_id,
                 'mode_of_delivery' => $request->mode_of_delivery,
-                'is_polished' => $request->is_polished,
+                // 'is_polished' => $request->is_polished,
                 'expected_delivery_date' => $request->expected_delivery_date,
                 'logistic_id' => $request->logistics == "" ? null : $request->logistics,
-                'po_status' => $request->minimum_discount > $request->discount_percent ? "Discount Approval" : "Pending",
+                'po_status' => "Pending",
                 'order_amount' => $request->order_amount,
-                'minimum_discount' => $request->minimum_discount,
+                // 'minimum_discount' => $request->minimum_discount,
                 'discount_amount' => $request->discount_amount,
                 'discount_percent' => $request->discount_percent,
                 'discounted_total' => $request->discounted_total,
@@ -93,8 +93,10 @@ class PurchaseOrderService
                 'sgst_amount' => $request->sgst_amount ?: 0,
                 'total_amount' => $request->total_amount,
                 'remarks' => $request->remarks,
-                'created_by' => auth()->user()->id,
+                'created_by' => $request->created_by ?? auth()->user()->id,
             ]);
+
+
 
             $purchaseGstEntries = $request->gst_entries;
 
@@ -110,6 +112,8 @@ class PurchaseOrderService
                     'sgst_amount' => $purchaseGst['sgst_amount']
                 ]);
             }
+
+
 
 
             $vendor = Vendor::find($purchaseOrder->vendor_id);
@@ -138,7 +142,6 @@ class PurchaseOrderService
                 $itemName = Str::slug($itemModel->item_name);
                 $timestamp = now()->format('Y-m-d_His');
                 $folder = "purchase_order_images/{$vendorCode}/{$poNumber->sequence}/{$itemName}";
-
 
                 $allImages = array_merge(
                     $item['images'] ?? [],
@@ -206,12 +209,12 @@ class PurchaseOrderService
                 'date' =>  Carbon::parse($request->date)->format('Y-m-d'),
                 'area_id' => $request->area_id,
                 'vendor_id' => $request->vendor_id,
-                'payment_terms_id' => $request->payment_terms_id,
+                // 'payment_terms_id' => $request->payment_terms_id,
                 'mode_of_delivery' => $request->mode_of_delivery,
-                'is_polished' => $request->is_polished,
+                // 'is_polished' => $request->is_polished,
                 'expected_delivery_date' => $request->expected_delivery_date,
                 'logistic_id' => $request->logistics,
-                'po_status' => $purchaseOrder->discount_percent !== $request->discount_percent ? ($request->minimum_discount > $request->discount_percent ? "Discount Approval" : "Pending") : $purchaseOrder->po_status,
+                'po_status' =>  $purchaseOrder->po_status,
                 'order_amount' => $request->order_amount,
                 'minimum_discount' => $request->minimum_discount,
                 'discount_amount' => $request->discount_amount,
@@ -223,7 +226,7 @@ class PurchaseOrderService
                 'sgst_amount' => $request->sgst_amount ?: 0,
                 'total_amount' => $request->total_amount,
                 'remarks' => $request->remarks,
-                'updated_by' => auth()->user()->id,
+                'updated_by' => $request->updated_by ?? auth()->user()->id,
             ]);
 
             $purchaseOrder->purchaseOrderGst()->delete();

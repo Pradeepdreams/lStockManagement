@@ -41,8 +41,6 @@ class ItemRequest extends FormRequest
                 Rule::unique('items', 'item_code')->ignore($id),
             ],
             'category_id' => 'required|exists:categories,id',
-            'margin_percent_from' => 'required|numeric|min:0|max:100',
-            'margin_percent_to' => 'required|numeric|min:0|max:100',
             'gst_percent' => 'required|numeric|min:0|max:100',
             'gst_applicable_date' => 'required|date',
             'hsn_applicable_date' => 'required|date',
@@ -71,16 +69,6 @@ class ItemRequest extends FormRequest
             'gst_applicable_date.required' => 'Applicable date is required.',
             'hsn_applicable_date.required' => 'Applicable date is required.',
             'hsn_code.required' => 'HSN Code is required.',
-            'attributes.required' => 'Attributes are required.',
-            'attributes.*.exists' => 'Selected attribute does not exist.',
-            'margin_percent_from.required' => 'Margin percent from is required.',
-            'margin_percent_from.numeric' => 'Margin percent from must be a number.',
-            'margin_percent_from.min' => 'Margin percent from cannot be negative.',
-            'margin_percent_from.max' => 'Margin percent from cannot exceed 100%.',
-            'margin_percent_to.required' => 'Margin percent to is required.',
-            'margin_percent_to.numeric' => 'Margin percent to must be a number.',
-            'margin_percent_to.min' => 'Margin percent to cannot be negative.',
-            'margin_percent_to.max' => 'Margin percent to cannot exceed 100%.',
         ];
     }
 }

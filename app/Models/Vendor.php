@@ -30,7 +30,7 @@ class Vendor extends Model
         'city',
         'state',
         'country',
-        'pincode_id',
+        'pincode',
         'payment_term_id',
         'credit_days',
         'credit_limit',

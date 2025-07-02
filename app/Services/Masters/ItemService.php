@@ -123,18 +123,10 @@ class ItemService
             'item_name' => $item->item_name,
             'item_code' => $item->item_code,
             'category_id' => $item->category_id,
-            // 'margin_percent_from' => $item->margin_percent_from,
-            // 'margin_percent_to' => $item->margin_percent_to,
             'reorder_level' => $item->reorder_level,
             'unit_of_measurement' => $item->unit_of_measurement,
             'id_crypt' => $item->id_crypt,
             'category' => $item->category,
-            // 'attributes' => $item->itemCategoryAttributeValues->map(function ($val) {
-            //     return [
-            //         'attribute_id' => $val->attributeCategory->attribute_id,
-            //         'attribute_value_id' => $val->attribute_value_id,
-            //     ];
-            // })->values(),
         ]);
     }
 
@@ -257,7 +249,7 @@ class ItemService
         //             $query->where('vendors.id', $id);
         //         })->get();
         // }
-        return Item::with('category.activeGstPercent', 'category.activeHsnCode')->latest()->get();
+        return Item::with('activeGstPercent', 'activeHsnCode', 'category')->latest()->get();
     }
 
 

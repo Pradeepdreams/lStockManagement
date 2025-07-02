@@ -35,8 +35,8 @@ class PurchaseOrderRequest extends FormRequest
             'date' => 'required|date',
             'area_id' => 'required|exists:areas,id',
             'vendor_id' => 'required|exists:vendors,id',
-            'payment_terms_id' => 'required|exists:payment_terms,id',
-            'is_polished' => 'required|boolean',
+            // 'payment_terms_id' => 'required|exists:payment_terms,id',
+            // 'is_polished' => 'required|boolean',
             'mode_of_delivery' => 'required_if:is_polished,false|string',
             'expected_delivery_date' => 'required|date',
             // 'logistics' => 'required_if:mode_of_delivery,mode_of_delivery|exists:logistics,id',
@@ -88,7 +88,7 @@ class PurchaseOrderRequest extends FormRequest
             'vendor_id.required' => 'Vendor is required.',
             'vendor_id.exists' => 'Selected vendor is invalid.',
 
-            'payment_terms_id.exists' => 'Selected payment term is invalid.',
+            // 'payment_terms_id.exists' => 'Selected payment term is invalid.',
 
             'is_polished.required' => 'polished is required.',
 

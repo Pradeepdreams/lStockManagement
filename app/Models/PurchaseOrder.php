@@ -25,7 +25,7 @@ class PurchaseOrder extends Model
         'order_amount',
         'gst_amount',
         'total_amount',
-        'minimum_discount',
+        // 'minimum_discount',
         'discount_percent',
         'discount_amount',
         'discounted_total',

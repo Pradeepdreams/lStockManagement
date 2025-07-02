@@ -173,7 +173,7 @@ class VendorService
                     'city',
                     'state',
                     'country',
-                    'pincode_id',
+                    'pincode',
                     'payment_term_id',
                     'credit_days',
                     'credit_limit',
@@ -201,7 +201,7 @@ class VendorService
                 $vendorData['group_id'] = $request->group_id == "" ? null : $request->group_id;
                 $vendorData['phone_no'] = $request->phone == "" ? null : $request->phone;
                 $vendorData['payment_term_id'] = $request->payment_term_id == "" ? null : $request->payment_term_id;
-                $vendorData['pincode_id'] = $request->pincode_id == "" ? null : $request->pincode_id;
+                $vendorData['pincode'] = $request->pincode == "" ? null : $request->pincode;
                 $vendorData['tds_detail_id'] = $request->tds_detail_id == "" ? null : $request->tds_detail_id;
                 $vendorData['credit_days'] = $request->credit_days == "" ? null : $request->credit_days;
                 $vendorData['gst_registration_type_id'] = $request->gst_registration_type_id == "" ? null : $request->gst_registration_type_id;
@@ -210,8 +210,8 @@ class VendorService
 
                 logActivity('Updated', $existingVendor, [$changes]);
 
-                $referredSourceType = $request->referred_source_type;
-                $referredSourceId = $request->referred_source_id;
+                // $referredSourceType = $request->referred_source_type;
+                // $referredSourceId = $request->referred_source_id;
 
                 // if ($existingVendor->referred_source_type !== $referredSourceType || $existingVendor->referred_source_id != $referredSourceId) {
 
@@ -292,7 +292,7 @@ class VendorService
                 'city',
                 'state',
                 'country',
-                'pincode_id',
+                'pincode',
                 'payment_term_id',
                 'credit_days',
                 'credit_limit',
@@ -356,7 +356,7 @@ class VendorService
             $vendorData['group_id'] = $request->group_id == "" ? null : $request->group_id;
             $vendorData['payment_term_id'] = $request->payment_term_id == "" ? null : $request->payment_term_id;
 
-            $vendorData['pincode_id'] = $request->pincode_id == "" ? null : $request->pincode_id;
+            $vendorData['pincode'] = $request->pincode == "" ? null : $request->pincode;
             $vendorData['tds_detail_id'] = $request->tds_detail_id == "" ? null : $request->tds_detail_id;
             $vendorData['credit_days'] = $request->credit_days == "" ? null : $request->credit_days;
             $vendorData['gst_registration_type_id'] = $request->gst_registration_type_id == "" ? null : $request->gst_registration_type_id;
@@ -436,7 +436,7 @@ class VendorService
                     'city' => $request->city ?: null,
                     'state' => $request->state ?: null,
                     'country' => $request->country ?: null,
-                    'pincode_id' => $request->pincode_id,
+                    'pincode' => $request->pincode,
                     'payment_term_id' => $request->payment_term_id ?: null,
                     'credit_days' => $request->credit_days ?: null,
                     'credit_limit' => $request->credit_limit,

@@ -18,8 +18,6 @@ class Item extends Model
         'item_name',
         'item_code',
         'category_id',
-        'margin_percent_from',
-        'margin_percent_to',
         'reorder_level',
         'unit_of_measurement'
     ];
