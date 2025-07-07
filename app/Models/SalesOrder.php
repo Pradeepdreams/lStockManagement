@@ -12,6 +12,8 @@ class SalesOrder extends Model
 {
     use HasFactory, SoftDeletes, LogModelChangesTrait, EncryptableIdTrait;
 
+    protected $appends = ['id_crypt'];
+
     protected $fillable = [
         'sales_order_number',
         'order_date',

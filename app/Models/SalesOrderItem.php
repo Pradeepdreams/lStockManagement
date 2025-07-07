@@ -11,6 +11,8 @@ class SalesOrderItem extends Model
 {
     use HasFactory, EncryptableIdTrait, LogModelChangesTrait;
 
+    protected $appends = ['id_crypt'];
+
     protected $fillable = [
         'sales_order_id',
         'item_id',
