@@ -23,6 +23,8 @@ class CustomerService
             });
         }
 
+        $customers = $customers->with('createdBy', 'updatedBy')->latest()->paginate(10);
+
         $getLinks = $customers->toArray();
 
         foreach ($getLinks['links'] as &$row) {
