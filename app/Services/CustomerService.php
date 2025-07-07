@@ -17,7 +17,7 @@ class CustomerService
 
 
     // Create a new customer (wrapped in DB transaction)
-    public function create($data)
+    public function store($data)
     {
         return DB::transaction(function () use ($data) {
             return Customer::create($data);

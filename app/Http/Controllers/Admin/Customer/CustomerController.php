@@ -20,13 +20,13 @@ class CustomerController extends Controller
     // GET /api/customers
     public function index()
     {
-        return $customers = $this->service->index();
+        return $this->service->index();
     }
 
     // POST /api/customers
     public function store(CustomerRequest $request)
     {
-        return $this->service->create($request->validated());
+        return $this->service->store($request->validated());
     }
 
     // GET /api/customers/{customer}

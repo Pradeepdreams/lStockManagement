@@ -24,7 +24,7 @@ class CustomerRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'phone' => 'required|string',
-            'type' => 'nullable|string',
+            'customer_type' => 'nullable|string',
             'email' => 'nullable|email',
             'address_line1' => 'nullable|string',
             'address_line2' => 'nullable|string',
@@ -33,6 +33,7 @@ class CustomerRequest extends FormRequest
             'country' => 'nullable|string',
             'pincode' => 'nullable|string',
             'gst_number' => 'nullable|string',
+            'gst_type' => 'nullable|string',
             'pan_number' => 'nullable|string',
             'credit_limit' => 'nullable|string',
             'customer_group' => 'nullable|string',
