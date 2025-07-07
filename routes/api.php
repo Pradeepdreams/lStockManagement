@@ -25,6 +25,7 @@ use App\Http\Controllers\Admin\Masters\TdsSectionController;
 use App\Http\Controllers\Admin\Masters\VendorGroupController;
 use App\Http\Controllers\Admin\PurchaseEntry\PurchaseEntryController;
 use App\Http\Controllers\Admin\PurchaseOrder\PurchaseOrderController;
+use App\Http\Controllers\Admin\SalesInvoice\SalesInvoiceController;
 use App\Http\Controllers\Admin\SalesOrder\SalesOrderController;
 use App\Http\Controllers\Admin\StockItem\StockItemController;
 use App\Http\Controllers\Admin\Vendor\VendorController;
@@ -221,4 +222,8 @@ Route::middleware(['auth:sanctum', SetUserBranch::class])->group(function () {
     Route::get('sales-orders/latest-number', [SalesOrderController::class, 'latestPo']);
     Route::get('sales-orders/list', [SalesOrderController::class, 'list']);
     Route::apiResource('sales-orders', SalesOrderController::class);
+
+    // Sales Invoice
+    Route::get('sales-invoices/latest-number', [SalesInvoiceController::class, 'latestEntry']);
+    Route::apiResource('sales-invoices', SalesInvoiceController::class);
 });

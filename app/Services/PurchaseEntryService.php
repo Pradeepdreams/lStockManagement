@@ -116,13 +116,14 @@ class PurchaseEntryService
 
                 if ($request['against_po'] == 1) {
                     $order = PurchaseOrder::find($request['purchase_order_id']);
-                    if ($itemCount == 0) {
+                    $poItems = PurchaseOrderItem::where('purchase_order_id', $request['purchase_order_id'])->where('item_status', 0)->get();
+
+                    if ($itemCount == 0 && $poItems->count() == 0) {
                         $order->po_status = 'Completed';
-                        $order->save();
                     } else {
                         $order->po_status = 'Partially Pending';
-                        $order->save();
                     }
+                    $order->save();
                 }
 
 
@@ -299,7 +300,13 @@ class PurchaseEntryService
 
             if ($request['against_po'] == 1) {
                 $order = PurchaseOrder::find($request['purchase_order_id']);
-                $order->po_status = $itemCount == 0 ? 'Completed' : 'Partially Pending';
+                $poItems = PurchaseOrderItem::where('purchase_order_id', $request['purchase_order_id'])->where('item_status', 0)->get();
+
+                if ($itemCount == 0 && $poItems->count() == 0) {
+                    $order->po_status = 'Completed';
+                } else {
+                    $order->po_status = 'Partially Pending';
+                }
                 $order->save();
             }
 
