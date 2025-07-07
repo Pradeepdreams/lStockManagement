@@ -23,7 +23,7 @@ class CustomerService
             });
         }
 
-        $customers = $customers->with('createdBy', 'updatedBy')->latest()->paginate(10);
+        $customers = $customers->latest()->paginate(10);
 
         $getLinks = $customers->toArray();
 
