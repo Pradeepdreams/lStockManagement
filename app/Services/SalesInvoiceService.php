@@ -40,30 +40,53 @@ class SalesInvoiceService
 
             $request['invoice_number'] = $invoiceNumber;
             $request['created_by'] = auth()->id();
-            $request['updated_by'] = auth()->id();
 
             $invoice = SalesInvoice::create($request);
 
-            foreach ($request['items'] as $item) {
-                if ($invoice->sales_order_id) {
-                    SalesOrderItem::where('id', $item['sales_order_item_id'])->update(['invoiced_quantity' => DB::raw("invoiced_quantity + {$item['quantity']}")]);
-                }
+            $hasPendingItems = false;
 
-                $invoice->items()->create($item);
+            foreach ($request['items'] as $item) {
+                $invoiceItem = $invoice->items()->create($item);
+
+                if (!empty($item['sales_order_item_id'])) {
+                    $soItem = SalesOrderItem::find($item['sales_order_item_id']);
+
+                    if ($soItem) {
+                        $soItem->invoiced_quantity += $item['quantity'];
+                        $soItem->pending_quantity = max(0, $soItem->ordered_quantity - $soItem->invoiced_quantity);
+                        $soItem->status = $soItem->pending_quantity == 0;
+                        $soItem->save();
+
+                        if ($soItem->pending_quantity > 0) {
+                            $hasPendingItems = true;
+                        }
+                    }
+                }
+            }
+
+            if (!empty($request['sales_order_id'])) {
+                $salesOrder = SalesOrder::with('items')->find($request['sales_order_id']);
+
+                if ($salesOrder) {
+                    $allInvoiced = $salesOrder->items->every(function ($item) {
+                        return $item->pending_quantity == 0;
+                    });
+
+                    $salesOrder->status = $allInvoiced ? 'Invoiced' : 'Partially Invoiced';
+                    $salesOrder->save();
+                }
             }
 
             foreach ($request['gst_details'] ?? [] as $gst) {
                 $invoice->gstDetails()->create($gst);
             }
 
-            if ($invoice->sales_order_id) {
-                $order = SalesOrder::find($invoice->sales_order_id);
-                $order->status = 'Invoiced';
-                $order->save();
-            }
-
             logActivity('Created', $invoice, [$invoice]);
-            return response()->json(['message' => 'Sales Invoice created successfully', 'invoice_number' => $invoiceNumber]);
+
+            return response()->json([
+                'message' => 'Sales Invoice created successfully',
+                'invoice_number' => $invoiceNumber
+            ]);
         });
     }
 
@@ -77,99 +100,75 @@ class SalesInvoiceService
     public function update($request, $id)
     {
         return DB::transaction(function () use ($request, $id) {
-            $invoice = SalesInvoice::with('items', 'gstDetails')->findOrFail($id);
+            $invoice = SalesInvoice::with('items')->findOrFail($id);
 
             $modelChanges = $invoice->getChangedAttributesFromRequest($request);
 
-            $itemChanges = [];
-            foreach ($invoice->items as $existingItem) {
-                $incomingItem = collect($request['items'])->firstWhere('item_id', $existingItem->item_id);
-                if ($incomingItem) {
-                    foreach (
-                        Arr::only($incomingItem, [
-                            'quantity',
-                            'item_price',
-                            'sub_total',
-                            'discount_percent',
-                            'discount_amount',
-                            'discounted_price',
-                            'gst_percent',
-                            'igst_percent',
-                            'cgst_percent',
-                            'sgst_percent',
-                            'igst_amount',
-                            'cgst_amount',
-                            'sgst_amount',
-                            'gst_amount',
-                            'total_amount',
-                            'after_discount_total'
-                        ]) as $key => $value
-                    ) {
-                        if ($existingItem->$key != $value) {
-                            $itemChanges[$existingItem->item_id][$key] = [
-                                'old' => $existingItem->$key,
-                                'new' => $value
-                            ];
-                        }
+            // Revert old items
+            foreach ($invoice->items as $oldItem) {
+                if ($oldItem->sales_order_item_id) {
+                    $soItem = SalesOrderItem::find($oldItem->sales_order_item_id);
+                    if ($soItem) {
+                        $soItem->invoiced_quantity = max(0, $soItem->invoiced_quantity - $oldItem->quantity);
+                        $soItem->pending_quantity = max(0, $soItem->ordered_quantity - $soItem->invoiced_quantity);
+                        $soItem->status = $soItem->pending_quantity == 0;
+                        $soItem->save();
                     }
-                } else {
-                    $itemChanges[$existingItem->item_id] = ['removed' => true];
                 }
             }
-
-            $gstChanges = [];
-            foreach ($invoice->gstDetails as $index => $oldGst) {
-                $newGst = $request['gst_details'][$index] ?? null;
-                if ($newGst) {
-                    foreach (
-                        Arr::only($newGst, [
-                            'gst_percent',
-                            'igst_percent',
-                            'cgst_percent',
-                            'sgst_percent',
-                            'igst_amount',
-                            'cgst_amount',
-                            'sgst_amount'
-                        ]) as $key => $value
-                    ) {
-                        if ($oldGst->$key != $value) {
-                            $gstChanges[$oldGst->id][$key] = [
-                                'old' => $oldGst->$key,
-                                'new' => $value
-                            ];
-                        }
-                    }
-                } else {
-                    $gstChanges[$index] = ['removed' => true];
-                }
-            }
-
-            $changes = [
-                'model' => $modelChanges,
-                'items' => $itemChanges,
-                'gst_details' => $gstChanges
-            ];
-
-            $request['updated_by'] = auth()->id();
-            $invoice->update($request);
 
             $invoice->items()->delete();
+            $invoice->gstDetails()->delete();
+
+            $hasPendingItems = false;
+
             foreach ($request['items'] as $item) {
-                $invoice->items()->create($item);
+                $invoiceItem = $invoice->items()->create($item);
+
+                if (!empty($item['sales_order_item_id'])) {
+                    $soItem = SalesOrderItem::find($item['sales_order_item_id']);
+
+                    if ($soItem) {
+                        $soItem->invoiced_quantity += $item['quantity'];
+                        $soItem->pending_quantity = max(0, $soItem->ordered_quantity - $soItem->invoiced_quantity);
+                        $soItem->status = $soItem->pending_quantity == 0;
+                        $soItem->save();
+
+                        if ($soItem->pending_quantity > 0) {
+                            $hasPendingItems = true;
+                        }
+                    }
+                }
             }
 
-            $invoice->gstDetails()->delete();
             foreach ($request['gst_details'] ?? [] as $gst) {
                 $invoice->gstDetails()->create($gst);
             }
 
-            if ($invoice->sales_order_id) {
-                $order = SalesOrder::find($invoice->sales_order_id);
-                $order->status = 'Invoiced';
-                $order->save();
+            if (!empty($request['sales_order_id'])) {
+                $salesOrder = SalesOrder::with('items')->find($request['sales_order_id']);
+
+                if ($salesOrder) {
+                    $allInvoiced = $salesOrder->items->every(function ($item) {
+                        return $item->pending_quantity == 0;
+                    });
+
+                    $salesOrder->status = $allInvoiced ? 'Invoiced' : 'Partially Invoiced';
+                    $salesOrder->save();
+                }
             }
 
+            $request['updated_by'] = auth()->id();
+            $invoice->update($request);
+
+            $changes = [
+                'model' => $modelChanges,
+                'items' => [], // You can optionally add diff logic for items
+                'gst_details' => []
+            ];
+
             logActivity('Updated', $invoice, $changes);
+
             return response()->json(['message' => 'Sales Invoice updated successfully']);
         });
     }

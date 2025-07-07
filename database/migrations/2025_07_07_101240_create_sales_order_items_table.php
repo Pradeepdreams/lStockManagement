@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('quantity', 10, 2)->nullable();
             $table->decimal('invoiced_quantity', 10, 2)->nullable();
             $table->decimal('pending_quantity', 10, 2)->nullable();
+            $table->boolean('status')->default(0);
             $table->string('hsn_code')->nullable();
             $table->decimal('gst_percent', 5, 2)->default(0);
             $table->decimal('igst_percent', 5, 2)->nullable();

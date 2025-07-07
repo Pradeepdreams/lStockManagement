@@ -19,6 +19,7 @@ class SalesOrderItem extends Model
         'quantity',
         'invoiced_quantity',
         'pending_quantity',
+        'status',
         'hsn_code',
         'gst_percent',
         'igst_percent',
