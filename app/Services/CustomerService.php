@@ -9,9 +9,20 @@ use Illuminate\Support\Facades\Crypt;
 
 class CustomerService
 {
-    public function index()
+    public function index($request)
     {
-        $customers = Customer::latest()->paginate(10);
+
+        $search = $request->search ?? null;
+        $customers = Customer::query(); // latest()->paginate(10);
+
+        if ($search) {
+            $customers->where(function ($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like',  $search . '%')
+                    ->orWhere('phone', 'like',  $search . '%');
+            });
+        }
+
         $getLinks = $customers->toArray();
 
         foreach ($getLinks['links'] as &$row) {

@@ -18,9 +18,9 @@ class CustomerController extends Controller
     }
 
     // GET /api/customers
-    public function index()
+    public function index(Request $request)
     {
-        return $this->service->index();
+        return $this->service->index($request);
     }
 
     // POST /api/customers
