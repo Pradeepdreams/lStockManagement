@@ -18,6 +18,25 @@ class SalesOrderService
         $salesOrders =  SalesOrder::query(); //with(['items.item', 'customer', 'gstDetails', 'area', 'logistic'])->latest()->paginate(20);
 
         $salesOrders->with(['items.item', 'customer', 'gstDetails', 'area', 'logistic'])->latest()->paginate(20);
+
+        $getLinks = $salesOrders->toArray();
+
+        foreach ($getLinks['links'] as &$row) {
+
+            if ($row['label'] == "Next &raquo;") {
+
+                $row['label'] = 'Next';
+            }
+
+            if ($row['label'] == "&laquo; Previous") {
+
+                $row['label'] = 'Previous';
+            }
+        }
+        return response([
+            'success' => true,
+            'sales_orders' => $getLinks
+        ]);
     }
 
     public function store($request)

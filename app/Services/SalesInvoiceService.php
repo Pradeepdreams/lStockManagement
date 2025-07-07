@@ -30,7 +30,25 @@ class SalesInvoiceService
         }
 
         $invoices = $query->with('customer', 'items.item', 'gstDetails', 'salesOrder')->latest()->paginate(10);
-        return response()->json(['success' => true, 'invoices' => $invoices]);
+        // return response()->json(['success' => true, 'invoices' => $invoices]);
+        $getLinks = $invoices->toArray();
+
+        foreach ($getLinks['links'] as &$row) {
+
+            if ($row['label'] == "Next &raquo;") {
+
+                $row['label'] = 'Next';
+            }
+
+            if ($row['label'] == "&laquo; Previous") {
+
+                $row['label'] = 'Previous';
+            }
+        }
+        return response([
+            'success' => true,
+            'sales_invoices' => $getLinks
+        ]);
     }
 
     public function store($request)
