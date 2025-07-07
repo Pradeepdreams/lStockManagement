@@ -42,8 +42,8 @@ class CustomerController extends Controller
     }
 
     // DELETE /api/customers/{customer}
-    public function destroy(Customer $customer)
+    public function destroy($id)
     {
-        return $this->service->destroy($customer);
+        return $this->service->destroy($id);
     }
 }
