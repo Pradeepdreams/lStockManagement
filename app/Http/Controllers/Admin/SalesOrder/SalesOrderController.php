@@ -49,4 +49,9 @@ class SalesOrderController extends Controller
     {
         return $this->service->salesInvoiceList();
     }
+
+    public function latestPo()
+    {
+        return $this->service->latestPo();
+    }
 }

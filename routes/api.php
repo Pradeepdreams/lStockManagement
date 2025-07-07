@@ -218,6 +218,7 @@ Route::middleware(['auth:sanctum', SetUserBranch::class])->group(function () {
 
 
     // Sales Order
+    Route::get('sales-orders/latest-number', [SalesOrderController::class, 'latestPo']);
     Route::get('sales-orders/list', [SalesOrderController::class, 'list']);
     Route::apiResource('sales-orders', SalesOrderController::class);
 });

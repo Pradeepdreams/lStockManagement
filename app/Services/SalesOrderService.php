@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\SalesOrder;
 use App\Models\SalesOrderItem;
 use App\Models\SalesOrderGstDetail;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Arr;
@@ -161,5 +162,47 @@ class SalesOrderService
     {
         $entries = SalesOrder::whereIn('status', ['Delivered'])->latest()->get();
         return response()->json($entries);
+    }
+
+
+    public function latestPo()
+    {
+        $datePrefix = $this->getAccountingYear();
+
+        $lastOrder = SalesOrder::where('sales_order_number', 'like', 'SO/' . $datePrefix . '/%')
+            ->orderByDesc('id')->withTrashed()
+            ->first();
+
+        if ($lastOrder && preg_match('/SO\/' . preg_quote($datePrefix, '/') . '\/(\d+)/', $lastOrder->sales_order_number, $matches)) {
+            $sequence = (int) $matches[1] + 1;
+        } else {
+            $sequence = 1;
+        }
+
+        $sequence = str_pad($sequence, 4, '0', STR_PAD_LEFT);
+
+        $soNumber = 'SO/' . $datePrefix . '/' . $sequence;
+
+        return response()->json(['sales_order_number' => $soNumber, 'sequence' => $sequence]);
+    }
+
+
+    // accounting year
+    public function getAccountingYear(): string
+    {
+        $now = now();
+
+        $year = $now->year;
+        $startOfFY = Carbon::create($year, 4, 1);
+
+        if ($now->lt($startOfFY)) {
+            $startYear = $year - 1;
+            $endYear = $year;
+        } else {
+            $startYear = $year;
+            $endYear = $year + 1;
+        }
+
+        return $startYear . '-' . substr($endYear, -2);
     }
 }
