@@ -1,0 +1,165 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\SalesOrder;
+use App\Models\SalesOrderItem;
+use App\Models\SalesOrderGstDetail;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Crypt;
+
+class SalesOrderService
+{
+    public function index($request)
+    {
+        $salesOrders =  SalesOrder::query(); //with(['items.item', 'customer', 'gstDetails', 'area', 'logistic'])->latest()->paginate(20);
+
+        $salesOrders->with(['items.item', 'customer', 'gstDetails', 'area', 'logistic'])->latest()->paginate(20);
+    }
+
+    public function store($request)
+    {
+        DB::transaction(function () use ($request, &$entry) {
+            $data = $request->only((new SalesOrder)->getFillable());
+            $entry = SalesOrder::create($data);
+
+            foreach ($request->items as $item) {
+                $entry->items()->create($item);
+            }
+
+            foreach ($request->gst_details ?? [] as $gst) {
+                $entry->gstDetails()->create($gst);
+            }
+
+            logActivity('Created', $entry, [$entry]);
+        });
+
+        return response()->json(['message' => 'Sales Order created successfully']);
+    }
+
+    public function show($id)
+    {
+        $id = Crypt::decryptString($id);
+        $entry = SalesOrder::with(['items.item', 'customer', 'gstDetails', 'area', 'logistic'])->findOrFail($id);
+        return response()->json($entry);
+    }
+
+    public function update($request, $id)
+    {
+        return DB::transaction(function () use ($request, $id) {
+            $id = Crypt::decryptString($id);
+            $entry = SalesOrder::with('items', 'gstDetails')->findOrFail($id);
+            $modelChanges = $entry->getChangedAttributesFromRequest($request);
+
+            $itemChanges = [];
+            foreach ($entry->items as $oldItem) {
+                $newItem = collect($request['items'] ?? [])->firstWhere('item_id', $oldItem->item_id);
+                if ($newItem) {
+                    foreach (
+                        Arr::only($newItem, [
+                            'item_id',
+                            'category_id',
+                            'quantity',
+                            'price',
+                            'discount_price',
+                            'discounted_amount',
+                            'total_item_price',
+                            'overall_item_price',
+                            'gst_percent',
+                            'igst_percent',
+                            'cgst_percent',
+                            'sgst_percent',
+                            'igst_amount',
+                            'cgst_amount',
+                            'sgst_amount',
+                            'item_gst_amount'
+                        ]) as $key => $value
+                    ) {
+                        if ($oldItem->$key != $value) {
+                            $itemChanges[$oldItem->item_id][$key] = [
+                                'old' => $oldItem->$key,
+                                'new' => $value,
+                            ];
+                        }
+                    }
+                } else {
+                    $itemChanges[$oldItem->item_id] = ['removed' => true];
+                }
+            }
+
+            $gstChanges = [];
+            foreach ($entry->gstDetails as $index => $oldGst) {
+                $newGst = $request['gst_details'][$index] ?? null;
+                if ($newGst) {
+                    foreach (
+                        Arr::only($newGst, [
+                            'gst_percent',
+                            'igst_percent',
+                            'cgst_percent',
+                            'sgst_percent',
+                            'igst_amount',
+                            'cgst_amount',
+                            'sgst_amount'
+                        ]) as $key => $value
+                    ) {
+                        if ($oldGst->$key != $value) {
+                            $gstChanges[$oldGst->id][$key] = [
+                                'old' => $oldGst->$key,
+                                'new' => $value,
+                            ];
+                        }
+                    }
+                } else {
+                    $gstChanges[$index] = ['removed' => true];
+                }
+            }
+
+            $changes = [
+                'model' => $modelChanges,
+                'items' => $itemChanges,
+                'gst_details' => $gstChanges,
+            ];
+
+            $entry->update($request->only($entry->getFillable()));
+
+            $entry->items()->delete();
+            foreach ($request['items'] ?? [] as $item) {
+                $entry->items()->create($item);
+            }
+
+            $entry->gstDetails()->delete();
+            foreach ($request['gst_details'] ?? [] as $gst) {
+                $entry->gstDetails()->create($gst);
+            }
+
+            logActivity('Updated', $entry, $changes);
+
+            return response()->json(['message' => 'Sales Order updated successfully.']);
+        });
+    }
+
+    public function destroy($id)
+    {
+        $id = Crypt::decryptString($id);
+        $entry = SalesOrder::findOrFail($id);
+        $entry->delete();
+
+        logActivity('Deleted', $entry, [$entry]);
+        return response()->json(['message' => 'Sales Order deleted successfully']);
+    }
+
+
+    public function list()
+    {
+        $entries = SalesOrder::latest()->get();
+        return response()->json($entries);
+    }
+
+    public function salesInvoiceList()
+    {
+        $entries = SalesOrder::whereIn('status', ['Delivered'])->latest()->get();
+        return response()->json($entries);
+    }
+}

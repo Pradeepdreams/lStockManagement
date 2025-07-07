@@ -12,7 +12,25 @@ class CustomerService
     public function index()
     {
         $customers = Customer::latest()->paginate(10);
-        return $customers;
+        $getLinks = $customers->toArray();
+
+        foreach ($getLinks['links'] as &$row) {
+
+            if ($row['label'] == "Next &raquo;") {
+
+                $row['label'] = 'Next';
+            }
+
+            if ($row['label'] == "&laquo; Previous") {
+
+                $row['label'] = 'Previous';
+            }
+        }
+        return response([
+            'success' => true,
+            'customers' => $getLinks
+        ]);
+        // return $customers;
     }
 
 
