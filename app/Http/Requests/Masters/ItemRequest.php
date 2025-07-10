@@ -47,6 +47,9 @@ class ItemRequest extends FormRequest
             'hsn_code' => 'required|numeric',
             'reorder_level' => 'nullable|string',
             'unit_of_measurement' => 'required|string',
+            'item_type' => 'required|string',
+            'purchase_price' => 'nullable|numeric',
+            'selling_price' => 'nullable|numeric',
         ];
     }
 

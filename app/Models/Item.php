@@ -19,7 +19,10 @@ class Item extends Model
         'item_code',
         'category_id',
         'reorder_level',
-        'unit_of_measurement'
+        'unit_of_measurement',
+        'item_type',
+        'purchase_price',
+        'selling_price',
     ];
 
 

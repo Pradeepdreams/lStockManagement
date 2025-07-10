@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\Masters\LogisticController;
 use App\Http\Controllers\Admin\Masters\PaymentTermController;
 use App\Http\Controllers\Admin\Masters\PincodeController;
 use App\Http\Controllers\Admin\Masters\QualificationController;
+use App\Http\Controllers\Admin\Masters\RequestPlatformController;
 use App\Http\Controllers\Admin\Masters\SocialMediaController;
 use App\Http\Controllers\Admin\Masters\TdsDetailController;
 use App\Http\Controllers\Admin\Masters\TdsSectionController;
@@ -226,4 +227,8 @@ Route::middleware(['auth:sanctum', SetUserBranch::class])->group(function () {
     // Sales Invoice
     Route::get('sales-invoices/latest-number', [SalesInvoiceController::class, 'latestEntry']);
     Route::apiResource('sales-invoices', SalesInvoiceController::class);
+
+    //Request Platform
+    Route::get('/request-platform/list', [RequestPlatformController::class, 'list']);
+    Route::apiResource('request-platform', RequestPlatformController::class);
 });
