@@ -161,17 +161,11 @@ class VendorRequest extends FormRequest
             'gst_registration_type_id.exists' => 'Selected GST registration type does not exist.',
             'tds_detail_id.required' => 'TDS detail field is required.',
             'tds_detail_id.exists' => 'Selected TDS detail does not exist.',
-            // 'transport_facility_provided.boolean' => 'Transport facility provided must be true or false.',
-            // 'reffered_source_type.string' => 'Referred source category must be a string.',
-            // 'reffered_source_id.integer' => 'Referred source ID must be an integer.',
             'vendor_contact_details.array' => 'Vendor contact details must be an array.',
             'vendor_contact_details.*.name.required' => 'Each contact must have a name.',
             'vendor_contact_details.*.name.string' => 'Each contact name must be a string.',
             'vendor_contact_details.*.phone_no.string' => 'Each contact phone number must be a string.',
             'vendor_contact_details.*.email.email' => 'Each contact email must be a valid email address.',
-            // 'items.array' => 'Items must be an array.',
-            // 'items.*.integer' => 'Each item must be a valid integer.',
-            // 'items.*.exists' => 'One or more selected items do not exist.',
         ];
     }
 }

@@ -209,7 +209,7 @@ class CustomerService
     public function show($id)
     {
         $id = Crypt::decryptString($id);
-        $customer = Customer::findOrFail($id);
+        $customer = Customer::with('customerContactDetails', 'customerUpi')->findOrFail($id);
         return $customer;
     }
 
