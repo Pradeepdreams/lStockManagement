@@ -26,7 +26,7 @@ class CustomerController extends Controller
     // POST /api/customers
     public function store(CustomerRequest $request)
     {
-        return $this->service->store($request->validated());
+        return $this->service->store($request);
     }
 
     // GET /api/customers/{customer}

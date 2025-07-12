@@ -15,19 +15,40 @@ class Customer extends Model
 
     protected $fillable = [
         'name',
-        'customer_type',
+        'group_id',
+        'gst_in',
+        'pan_number',
+        'phone_no',
         'email',
-        'phone',
-        'address_line1',
-        'address_line2',
+        'address_line_1',
+        'address_line_2',
+        'area_id',
         'city',
         'state',
         'country',
         'pincode',
-        'gst_number',
-        'gst_type',
-        'pan_number',
+        'payment_term_id',
+        'credit_days',
         'credit_limit',
-        'customer_group',
+        'gst_applicable',
+        'gst_registration_type_id',
+        'tds_detail_id',
+        'created_by',
+        'updated_by'
     ];
+
+    public function customerContactDetails()
+    {
+        return $this->hasMany(CustomerContactDetail::class);
+    }
+
+    public function customerUpi()
+    {
+        return $this->hasMany(CustomerUPI::class);
+    }
+
+    public function salesInvoices()
+    {
+        return $this->hasMany(SalesInvoice::class);
+    }
 }
