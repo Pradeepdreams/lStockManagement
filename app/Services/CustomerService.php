@@ -68,7 +68,7 @@ class CustomerService
             // Restore if soft-deleted customer matches any of the key fields
             $existingCustomer = Customer::onlyTrashed()
                 ->where(function ($query) use ($request) {
-                    $query->where('customer_name', $request->customer_name)
+                    $query->where('name', $request->name)
                         ->orWhere('gst_in', $request->gst_in)
                         ->orWhere('phone_no', $request->phone)
                         ->orWhere('email', $request->email);
@@ -84,7 +84,7 @@ class CustomerService
                 $customerData = array_map(function ($value) {
                     return $value === '' ? null : $value;
                 }, $request->only([
-                    'customer_name',
+                    'name',
                     'group_id',
                     'gst_in',
                     'pan_number',
@@ -146,7 +146,7 @@ class CustomerService
             $customerData = array_map(function ($value) {
                 return $value === '' ? null : $value;
             }, $request->only([
-                'customer_name',
+                'name',
                 'group_id',
                 'gst_in',
                 'pan_number',
@@ -243,7 +243,7 @@ class CustomerService
                 $changes = $customer->getChangedAttributesFromRequest($request->all());
 
                 $customerData = [
-                    'customer_name' => $request->customer_name,
+                    'name' => $request->name,
                     'group_id' => $request->group_id ?: null,
                     'gst_in' => $request->gst_in,
                     'pan_number' => $request->pan_number,
