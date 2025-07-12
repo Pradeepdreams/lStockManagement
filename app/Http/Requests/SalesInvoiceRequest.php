@@ -26,7 +26,8 @@ class SalesInvoiceRequest extends FormRequest
             'invoice_date'           => 'required|date',
 
             'customer_id'            => 'required|exists:customers,id',
-            'sales_order_id'         => 'nullable|exists:sales_orders,id',
+            'against_sales_order'    => 'required|boolean',
+            'sales_order_id'         => 'required_if:against_sales_order,true|exists:sales_orders,id',
 
             'mode_of_delivery'       => 'nullable|string|max:255',
             'remarks'                => 'nullable|string',

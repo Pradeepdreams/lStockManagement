@@ -17,6 +17,7 @@ class SalesInvoice extends Model
         'invoice_number',
         'invoice_date',
         'customer_id',
+        'against_sales_order',
         'sales_order_id',
         'mode_of_delivery',
         'remarks',
@@ -34,9 +35,9 @@ class SalesInvoice extends Model
         'updated_by'
     ];
 
-    protected $casts = [
-        'invoice_date' => 'date',
-    ];
+    // protected $casts = [
+    //     'invoice_date' => 'date',
+    // ];
 
     public function customer()
     {

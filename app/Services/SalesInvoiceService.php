@@ -54,35 +54,31 @@ class SalesInvoiceService
     public function store($request)
     {
         return DB::transaction(function () use ($request) {
-            $invoiceNumber = $this->latestEntry();
 
+            $invoiceNumber = $this->latestEntry();
             $request['invoice_number'] = $invoiceNumber;
             $request['created_by'] = auth()->id();
 
             $invoice = SalesInvoice::create($request);
 
-            $hasPendingItems = false;
 
-            foreach ($request['items'] as $item) {
-                $invoiceItem = $invoice->items()->create($item);
+            foreach ($request['items'] as $itemData) {
 
-                if (!empty($item['sales_order_item_id'])) {
-                    $soItem = SalesOrderItem::find($item['sales_order_item_id']);
+                $invoiceItem = $invoice->items()->create($itemData);
+
+                if (!empty($itemData['sales_order_item_id']) && $request['against_sales_order'] == 1) {
+                    $soItem = SalesOrderItem::find($itemData['sales_order_item_id']);
 
                     if ($soItem) {
-                        $soItem->invoiced_quantity += $item['quantity'];
+                        $soItem->invoiced_quantity += $itemData['quantity'];
                         $soItem->pending_quantity = max(0, $soItem->ordered_quantity - $soItem->invoiced_quantity);
-                        $soItem->status = $soItem->pending_quantity == 0;
+                        $soItem->status = $soItem->pending_quantity == 0 ? 1 : 0;
                         $soItem->save();
-
-                        if ($soItem->pending_quantity > 0) {
-                            $hasPendingItems = true;
-                        }
                     }
                 }
             }
 
-            if (!empty($request['sales_order_id'])) {
+            if (!empty($request['sales_order_id']) && $request['against_sales_order'] == 1) {
                 $salesOrder = SalesOrder::with('items')->find($request['sales_order_id']);
 
                 if ($salesOrder) {
@@ -107,6 +103,7 @@ class SalesInvoiceService
             ]);
         });
     }
+
 
     public function show($id)
     {
