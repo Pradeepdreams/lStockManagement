@@ -38,7 +38,7 @@ class CustomerController extends Controller
     // PUT/PATCH /api/customers/{customer}
     public function update(CustomerRequest $request, $id)
     {
-        return $this->service->update($request->validated(), $id);
+        return $this->service->update($request, $id);
     }
 
     // DELETE /api/customers/{customer}

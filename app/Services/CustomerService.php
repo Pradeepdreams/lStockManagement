@@ -128,17 +128,17 @@ class CustomerService
 
                 if ($request->has('customer_contact_details')) {
                     $existingCustomer->customerContactDetails()->delete();
-                    foreach ($request->customer_contact_details as $contact) {
+                    foreach ($request['customer_contact_details'] as $contact) {
                         $existingCustomer->customerContactDetails()->create($contact);
                     }
                 }
 
-                if ($request->has('customer_upi')) {
-                    $existingCustomer->customerUpi()->delete();
-                    foreach ($request->customer_upi as $upi) {
-                        $existingCustomer->customerUpi()->create($upi);
-                    }
-                }
+                // if ($request->has('customer_upi')) {
+                //     $existingCustomer->customerUpi()->delete();
+                //     foreach ($request->customer_upi as $upi) {
+                //         $existingCustomer->customerUpi()->create($upi);
+                //     }
+                // }
 
                 return $existingCustomer->load(['customerContactDetails', 'customerUpi']);
             }
@@ -190,7 +190,7 @@ class CustomerService
 
 
             if ($request->has('customer_contact_details')) {
-                foreach ($request->customer_contact_details as $contact) {
+                foreach ($request['customer_contact_details'] as $contact) {
                     $customer->customerContactDetails()->create($contact);
                 }
             }
@@ -282,7 +282,7 @@ class CustomerService
                 // Sync customer contact details
                 if ($request->has('customer_contact_details')) {
                     $customer->customerContactDetails()->delete();
-                    foreach ($request->customer_contact_details as $contact) {
+                    foreach ($request['customer_contact_details'] as $contact) {
                         $customer->customerContactDetails()->create($contact);
                     }
                 }
