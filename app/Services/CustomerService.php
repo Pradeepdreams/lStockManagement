@@ -89,6 +89,7 @@ class CustomerService
                     'gst_in',
                     'pan_number',
                     'phone',
+                    'customer_type',
                     'email',
                     'address_line_1',
                     'address_line_2',
@@ -151,6 +152,7 @@ class CustomerService
                 'gst_in',
                 'pan_number',
                 'phone',
+                'customer_type',
                 'email',
                 'address_line_1',
                 'address_line_2',
@@ -193,11 +195,11 @@ class CustomerService
                 }
             }
 
-            if ($request->has('customer_upi') && is_array($request->customer_upi)) {
-                foreach ($request->customer_upi as $upi) {
-                    $customer->customerUpi()->create($upi);
-                }
-            }
+            // if ($request->has('customer_upi') && is_array($request->customer_upi)) {
+            //     foreach ($request->customer_upi as $upi) {
+            //         $customer->customerUpi()->create($upi);
+            //     }
+            // }
 
             logActivity('Created', $customer, [$customer]);
 
@@ -248,6 +250,7 @@ class CustomerService
                     'gst_in' => $request->gst_in,
                     'pan_number' => $request->pan_number,
                     'phone_no' => $request->phone,
+                    'customer_type' => $request->customer_type,
                     'email' => $request->email,
                     'address_line_1' => $request->address_line_1,
                     'address_line_2' => $request->address_line_2,
