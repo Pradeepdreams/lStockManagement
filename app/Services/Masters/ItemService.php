@@ -273,13 +273,13 @@ class ItemService
             $item = Item::findOrFail($id);
 
             // return $item;
-            if ($item->salesOrders()->count() > 0) {
+            if ($item->salesOrderItems()->count() > 0) {
                 return response()->json([
                     'message' => 'Cannot delete item. It is assigned to one or more sales Orders.',
                 ], 400);
             }
 
-            if ($item->salesInvoices()->count() > 0) {
+            if ($item->salesInvoiceItems()->count() > 0) {
                 return response()->json([
                     'message' => 'Cannot delete item. It is assigned to one or more sales Invoices.',
                 ], 400);

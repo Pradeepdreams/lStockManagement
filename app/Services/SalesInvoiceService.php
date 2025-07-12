@@ -178,7 +178,7 @@ class SalesInvoiceService
 
             $changes = [
                 'model' => $modelChanges,
-                'items' => [], // You can optionally add diff logic for items
+                'items' => [],
                 'gst_details' => []
             ];
 
