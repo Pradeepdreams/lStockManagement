@@ -20,6 +20,7 @@ class Customer extends Model
         'gst_in',
         'pan_number',
         'phone_no',
+        'customer_type',
         'email',
         'address_line_1',
         'address_line_2',
