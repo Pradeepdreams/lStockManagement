@@ -146,6 +146,9 @@ class ItemService
             'category_id' => $item->category_id,
             'reorder_level' => $item->reorder_level,
             'unit_of_measurement' => $item->unit_of_measurement,
+            'item_type' => $item->item_type,
+            'purchase_price' => $item->purchase_price,
+            'selling_price' => $item->selling_price,
             'id_crypt' => $item->id_crypt,
             'category' => $item->category,
             'active_gst_percent' => $item->activeGstPercent,
@@ -270,9 +273,21 @@ class ItemService
             $item = Item::findOrFail($id);
 
             // return $item;
-            if ($item->vendors()->count() > 0) {
+            if ($item->salesOrders()->count() > 0) {
                 return response()->json([
-                    'message' => 'Cannot delete item. It is assigned to one or more vendors.',
+                    'message' => 'Cannot delete item. It is assigned to one or more sales Orders.',
+                ], 400);
+            }
+
+            if ($item->salesInvoices()->count() > 0) {
+                return response()->json([
+                    'message' => 'Cannot delete item. It is assigned to one or more sales Invoices.',
+                ], 400);
+            }
+
+            if ($item->purchaseOrderItems()->count() > 0) {
+                return response()->json([
+                    'message' => 'Cannot delete item. It is assigned to one or more Purchase Orders.',
                 ], 400);
             }
             $item->delete();

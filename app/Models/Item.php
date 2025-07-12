@@ -36,11 +36,26 @@ class Item extends Model
     //     return $this->hasMany(ItemCategoryAttributeValue::class);
     // }
 
-    public function vendors()
+    // public function vendors()
+    // {
+    //     return $this->belongsToMany(Vendor::class);
+    // }
+
+
+    public function purchaseOrderItems()
     {
-        return $this->belongsToMany(Vendor::class);
+        return $this->hasMany(PurchaseOrderItem::class);
     }
 
+    public function salesInvoices()
+    {
+        return $this->hasMany(SalesInvoice::class);
+    }
+
+    public function salesOrders()
+    {
+        return $this->hasMany(SalesOrder::class);
+    }
 
 
     // public function itemCategoryAttributeValues()
