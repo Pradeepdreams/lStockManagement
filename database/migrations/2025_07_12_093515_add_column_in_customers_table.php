@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('customers', function (Blueprint $table) {
+            $table->string('customer_type')->nullable()->after('phone_no');
             $table->softDeletes();
         });
     }
@@ -22,6 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('customers', function (Blueprint $table) {
+            $table->dropColumn('customer_type');
             $table->dropSoftDeletes();
         });
     }
