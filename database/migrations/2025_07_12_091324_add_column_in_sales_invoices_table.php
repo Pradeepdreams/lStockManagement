@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('customers', function (Blueprint $table) {
-            $table->string('gst_type')->nullable()->after('gst_number');
-            $table->renameColumn('type', 'customer_type');
+        Schema::table('sales_invoices', function (Blueprint $table) {
+            //
         });
     }
 
@@ -22,9 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('customers', function (Blueprint $table) {
-            $table->dropColumn('gst_type');
-            $table->renameColumn('customer_type', 'type');
+        Schema::table('sales_invoices', function (Blueprint $table) {
+            //
         });
     }
 };
