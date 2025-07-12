@@ -119,7 +119,6 @@ class SalesInvoiceService
 
             $modelChanges = $invoice->getChangedAttributesFromRequest($request);
 
-            // Revert old items
             foreach ($invoice->items as $oldItem) {
                 if ($oldItem->sales_order_item_id) {
                     $soItem = SalesOrderItem::find($oldItem->sales_order_item_id);
@@ -135,7 +134,6 @@ class SalesInvoiceService
             $invoice->items()->delete();
             $invoice->gstDetails()->delete();
 
-            $hasPendingItems = false;
 
             foreach ($request['items'] as $item) {
                 $invoiceItem = $invoice->items()->create($item);
@@ -149,9 +147,6 @@ class SalesInvoiceService
                         $soItem->status = $soItem->pending_quantity == 0;
                         $soItem->save();
 
-                        if ($soItem->pending_quantity > 0) {
-                            $hasPendingItems = true;
-                        }
                     }
                 }
             }
