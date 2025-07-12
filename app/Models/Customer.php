@@ -6,10 +6,11 @@ use App\Traits\EncryptableIdTrait;
 use App\Traits\LogModelChangesTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Customer extends Model
 {
-    use HasFactory, EncryptableIdTrait, LogModelChangesTrait;
+    use SoftDeletes, HasFactory, EncryptableIdTrait, LogModelChangesTrait;
 
     protected $appends = ['id_crypt'];
 
