@@ -178,7 +178,7 @@ class CustomerService
             $customerData['phone_no'] = $request->phone ?: null;
             $customerData['group_id'] = $request->group_id ?: null;
             $customerData['payment_term_id'] = $request->payment_term_id ?: null;
-            $customerData['pincode'] = $request->pincode ?: null;
+            $customerData['pincode'] = isset($request->pincode) ? (string) $request->pincode : null;
             $customerData['tds_detail_id'] = $request->tds_detail_id ?: null;
             $customerData['credit_days'] = $request->credit_days ?: null;
             $customerData['gst_registration_type_id'] = $request->gst_registration_type_id ?: null;

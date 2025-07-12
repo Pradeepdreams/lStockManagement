@@ -23,7 +23,8 @@ class CustomerRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'phone_no' => 'required|string|max:20',
+            'phone' => 'required|string|max:20',
+            'customer_type' => 'required|string',
             'group_id' => 'nullable|integer|exists:groups,id',
             'gst_in' => 'nullable|string|max:20',
             'pan_number' => 'nullable|string|max:10',
@@ -34,11 +35,11 @@ class CustomerRequest extends FormRequest
             'city' => 'nullable|string|max:100',
             'state' => 'nullable|string|max:100',
             'country' => 'nullable|string|max:100',
-            'pincode' => 'nullable|string|max:10',
+            'pincode' => 'nullable',
             'payment_term_id' => 'nullable|integer|exists:payment_terms,id',
             'credit_days' => 'nullable|integer',
             'credit_limit' => 'nullable|numeric',
-            'gst_applicable' => 'nullable|boolean',
+            'gst_applicable' => 'nullable',
             'gst_registration_type_id' => 'nullable|integer|exists:gst_registration_types,id',
             'tds_detail_id' => 'nullable|integer|exists:tds_details,id',
         ];
