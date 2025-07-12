@@ -43,8 +43,10 @@ class ItemRequest extends FormRequest
             'category_id' => 'required|exists:categories,id',
             'gst_percent' => 'required|numeric|min:0|max:100',
             'gst_applicable_date' => 'required|date',
-            'hsn_applicable_date' => 'required|date',
-            'hsn_code' => 'required|numeric',
+            'hsn_applicable_date' => 'required_if:item_type,goods|date|nullable',
+            'hsn_code' => 'required_if:item_type,goods|numeric|nullable',
+            'sac_applicable_date' => 'required_if:item_type,service|date|nullable',
+            'sac_code' => 'required_if:item_type,service|numeric|nullable',
             'reorder_level' => 'nullable|string',
             'unit_of_measurement' => 'required|string',
             'item_type' => 'required|string',
@@ -72,6 +74,8 @@ class ItemRequest extends FormRequest
             'gst_applicable_date.required' => 'Applicable date is required.',
             'hsn_applicable_date.required' => 'Applicable date is required.',
             'hsn_code.required' => 'HSN Code is required.',
+            'sac_applicable_date.required' => 'Applicable date is required.',
+            'sac_code.required' => 'SAC Code is required.',
         ];
     }
 }

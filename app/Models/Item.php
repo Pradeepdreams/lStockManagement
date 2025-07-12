@@ -58,6 +58,11 @@ class Item extends Model
         return $this->hasMany(CategoryHsnApplicable::class);
     }
 
+    public function sac_code()
+    {
+        return $this->hasMany(CategorySacApplicable::class);
+    }
+
     public function latestGstPercent()
     {
         return $this->hasOne(CategoryGstApplicable::class, 'item_id')->latestOfMany('created_at');
@@ -68,6 +73,12 @@ class Item extends Model
     {
         return $this->hasOne(CategoryHsnApplicable::class, 'item_id')->latestOfMany('created_at');
         // return $this->hasOne(CategoryHsnApplicable::class, 'category_id')->latestOfMany('applicable_date');
+    }
+
+    public function latestSacCode()
+    {
+        return $this->hasOne(CategorySacApplicable::class, 'item_id')->latestOfMany('created_at');
+        // return $this->hasOne(CategorySacApplicable::class, 'category_id')->latestOfMany('applicable_date');
     }
 
 
@@ -81,6 +92,13 @@ class Item extends Model
     public function activeHsnCode()
     {
         return $this->hasOne(CategoryHsnApplicable::class, 'item_id')
+            ->where('applicable_date', '<=', Carbon::now()->format('Y-m-d'))
+            ->orderByDesc('applicable_date');
+    }
+
+    public function activeSacCode()
+    {
+        return $this->hasOne(CategorySacApplicable::class, 'item_id')
             ->where('applicable_date', '<=', Carbon::now()->format('Y-m-d'))
             ->orderByDesc('applicable_date');
     }

@@ -6,6 +6,7 @@ use App\Http\Requests\Masters\ItemRequest;
 use App\Models\AttributeCategory;
 use App\Models\CategoryGstApplicable;
 use App\Models\CategoryHsnApplicable;
+use App\Models\CategorySacApplicable;
 use App\Models\Item;
 use App\Models\ItemCategoryAttributeValue;
 use App\Models\PurchaseOrderItem;
@@ -35,8 +36,10 @@ class ItemService
             'category',
             'activeGstPercent',
             'activeHsnCode',
+            'activeSacCode',
             'latestGstPercent',
-            'latestHsnCode'
+            'latestHsnCode',
+            'latestSacCode',
 
         ])->latest()->paginate(10);
         $getLinks = $items->jsonSerialize();
@@ -72,7 +75,7 @@ class ItemService
                 $item = Item::create($validated);
 
                 // Log activity
-                logActivity('Created', $item, [$item]);
+
                 $gstApplicable = [
                     "item_id" => $item->id,
                     "gst_percent" => $request['gst_percent'],
@@ -82,18 +85,35 @@ class ItemService
                 ];
 
                 $gstCreate = CategoryGstApplicable::create($gstApplicable);
+                $item['gst'] = $gstCreate;
 
-                $hsnApplicable = [
-                    "item_id" => $item->id,
-                    "hsn_code" => $request['hsn_code'],
-                    "applicable_date" => isset($request['hsn_applicable_date'])
-                        ? Carbon::parse($request['hsn_applicable_date'])->format('Y-m-d')
-                        : null
-                ];
+                if ($item->item_type == 'Service') {
+                    $sacApplicable = [
+                        "item_id" => $item->id,
+                        "sac_code" => $request['sac_code'],
+                        "applicable_date" => isset($request['sac_applicable_date'])
+                            ? Carbon::parse($request['sac_applicable_date'])->format('Y-m-d')
+                            : null
+                    ];
 
-                $hsnCreate = CategoryHsnApplicable::create($hsnApplicable);
+                    $sacCreate = CategorySacApplicable::create($sacApplicable);
+                    $item['sac'] = $sacCreate;
+                }
 
+                if ($item->item_type == 'Goods') {
+                    $hsnApplicable = [
+                        "item_id" => $item->id,
+                        "hsn_code" => $request['hsn_code'],
+                        "applicable_date" => isset($request['hsn_applicable_date'])
+                            ? Carbon::parse($request['hsn_applicable_date'])->format('Y-m-d')
+                            : null
+                    ];
 
+                    $hsnCreate = CategoryHsnApplicable::create($hsnApplicable);
+                    $item['hsn'] = $hsnCreate;
+                }
+
+                logActivity('Created', $item, [$item]);
 
                 return $item;
             });
@@ -114,6 +134,7 @@ class ItemService
             'category',
             'latestGstPercent',
             'latestHsnCode',
+            'latestSacCode',
         ])->findOrFail($id);
 
         // return $item;
@@ -141,12 +162,15 @@ class ItemService
                 $id = Crypt::decryptString($id);
 
                 $item = Item::findOrFail($id);
+
+                $oldData = $item->toArray();
+
                 $item->update($validated);
 
-                // Log activity
-                logActivity('Updated', $item, [$item]);
+                $newData = $item->fresh()->toArray();
 
-                // Always create new GST entry (not update)
+                $changes = [];
+
                 $gstApplicable = [
                     "item_id" => $item->id,
                     "gst_percent" => $request['gst_percent'],
@@ -156,17 +180,68 @@ class ItemService
                 ];
 
                 CategoryGstApplicable::create($gstApplicable);
-
-                // Always create new HSN entry (not update)
-                $hsnApplicable = [
-                    "item_id" => $item->id,
-                    "hsn_code" => $request['hsn_code'],
-                    "applicable_date" => isset($request['hsn_applicable_date'])
-                        ? Carbon::parse($request['hsn_applicable_date'])->format('Y-m-d')
-                        : null
+                $changes['gst_percent'] = [
+                    'old' => null,
+                    'new' => $gstApplicable['gst_percent']
+                ];
+                $changes['gst_applicable_date'] = [
+                    'old' => null,
+                    'new' => $gstApplicable['applicable_date']
                 ];
 
-                CategoryHsnApplicable::create($hsnApplicable);
+                if ($item->item_type === 'Service') {
+                    $sacApplicable = [
+                        "item_id" => $item->id,
+                        "sac_code" => $request['sac_code'],
+                        "applicable_date" => isset($request['sac_applicable_date'])
+                            ? Carbon::parse($request['sac_applicable_date'])->format('Y-m-d')
+                            : null
+                    ];
+
+                    CategorySacApplicable::create($sacApplicable);
+
+                    $changes['sac_code'] = [
+                        'old' => null,
+                        'new' => $sacApplicable['sac_code']
+                    ];
+                    $changes['sac_applicable_date'] = [
+                        'old' => null,
+                        'new' => $sacApplicable['applicable_date']
+                    ];
+                }
+
+                if ($item->item_type === 'Goods') {
+                    $hsnApplicable = [
+                        "item_id" => $item->id,
+                        "hsn_code" => $request['hsn_code'],
+                        "applicable_date" => isset($request['hsn_applicable_date'])
+                            ? Carbon::parse($request['hsn_applicable_date'])->format('Y-m-d')
+                            : null
+                    ];
+
+                    CategoryHsnApplicable::create($hsnApplicable);
+
+                    $changes['hsn_code'] = [
+                        'old' => null,
+                        'new' => $hsnApplicable['hsn_code']
+                    ];
+                    $changes['hsn_applicable_date'] = [
+                        'old' => null,
+                        'new' => $hsnApplicable['applicable_date']
+                    ];
+                }
+
+                foreach ($newData as $key => $newValue) {
+                    $oldValue = $oldData[$key] ?? null;
+                    if ($oldValue != $newValue) {
+                        $changes[$key] = [
+                            'old' => $oldValue,
+                            'new' => $newValue
+                        ];
+                    }
+                }
+
+                logActivity('Updated', $item, $changes);
 
                 return $item;
             });
@@ -249,7 +324,7 @@ class ItemService
         //             $query->where('vendors.id', $id);
         //         })->get();
         // }
-        return Item::with('activeGstPercent', 'activeHsnCode', 'category')->latest()->get();
+        return Item::with('activeGstPercent', 'activeHsnCode','activeSacCode', 'category')->latest()->get();
     }
 
 
