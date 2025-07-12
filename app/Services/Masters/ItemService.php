@@ -135,6 +135,9 @@ class ItemService
             'latestGstPercent',
             'latestHsnCode',
             'latestSacCode',
+            'activeGstPercent',
+            'activeHsnCode',
+            'activeSacCode',
         ])->findOrFail($id);
 
         // return $item;

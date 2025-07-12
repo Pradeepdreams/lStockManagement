@@ -146,7 +146,6 @@ class SalesInvoiceService
                         $soItem->pending_quantity = max(0, $soItem->ordered_quantity - $soItem->invoiced_quantity);
                         $soItem->status = $soItem->pending_quantity == 0;
                         $soItem->save();
-
                     }
                 }
             }
@@ -201,11 +200,11 @@ class SalesInvoiceService
     {
         $datePrefix = $this->getAccountingYear();
 
-        $lastOrder = SalesInvoice::where('purchase_entry_number', 'like', 'PI/' . $datePrefix . '/%')
+        $lastOrder = SalesInvoice::where('invoice_number', 'like', 'SI/' . $datePrefix . '/%')
             ->orderByDesc('id')->withTrashed()
             ->first();
 
-        if ($lastOrder && preg_match('/PI\/' . preg_quote($datePrefix, '/') . '\/(\d+)/', $lastOrder->purchase_entry_number, $matches)) {
+        if ($lastOrder && preg_match('/SI\/' . preg_quote($datePrefix, '/') . '\/(\d+)/', $lastOrder->purchase_entry_number, $matches)) {
             $sequence = (int) $matches[1] + 1;
         } else {
             $sequence = 1;
@@ -213,9 +212,9 @@ class SalesInvoiceService
 
         $sequence = str_pad($sequence, 4, '0', STR_PAD_LEFT);
 
-        $piNumber = 'PI/' . $datePrefix . '/' . $sequence;
+        $siNumber = 'SI/' . $datePrefix . '/' . $sequence;
 
-        return response()->json(['purchase_entry_number' => $piNumber, 'sequence' => $sequence]);
+        return response()->json(['invoice_number' => $siNumber, 'sequence' => $sequence]);
     }
 
     public function getAccountingYear(): string
