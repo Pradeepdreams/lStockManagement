@@ -45,13 +45,13 @@ class ItemRequest extends FormRequest
             'gst_applicable_date' => 'required|date',
             'hsn_applicable_date' => 'required_if:item_type,goods|date|nullable',
             'hsn_code' => 'required_if:item_type,Goods|numeric|nullable',
-            'sac_applicable_date' => 'required_if:item_type,Service|date|nullable',
             'sac_code' => 'required_if:item_type,service|numeric|nullable',
+            'sac_applicable_date' => 'required_if:item_type,Service|date|nullable',
             'reorder_level' => 'nullable|string',
             'unit_of_measurement' => 'required|string',
             'item_type' => 'required|string',
-            'purchase_price' => 'nullable|numeric',
-            'selling_price' => 'nullable|numeric',
+            'purchase_price' => 'required|numeric',
+            'selling_price' => 'required|numeric',
         ];
     }
 
@@ -72,10 +72,10 @@ class ItemRequest extends FormRequest
             'gst_percent.min' => 'GST Percentage must be at least 0%.',
             'gst_percent.max' => 'GST Percentage cannot exceed 100%.',
             'gst_applicable_date.required' => 'Applicable date is required.',
-            'hsn_applicable_date.required' => 'Applicable date is required.',
-            'hsn_code.required' => 'HSN Code is required.',
-            'sac_applicable_date.required' => 'Applicable date is required.',
-            'sac_code.required' => 'SAC Code is required.',
+            'hsn_applicable_date.required_if' => 'Applicable date is required.',
+            'hsn_code.required_if' => 'HSN Code is required.',
+            'sac_applicable_date.required_if' => 'Applicable date is required.',
+            'sac_code.required_if' => 'SAC Code is required.',
         ];
     }
 }
