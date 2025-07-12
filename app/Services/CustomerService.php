@@ -227,7 +227,7 @@ class CustomerService
     // }
 
 
-    public function update($id, CustomerRequest $request)
+    public function update(CustomerRequest $request, $id)
     {
         abort_unless(auth()->user()->hasBranchPermission('update_customers'), 403, 'Unauthorized');
 
