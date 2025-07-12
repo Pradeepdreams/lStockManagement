@@ -49,12 +49,12 @@ class Item extends Model
 
     public function salesInvoiceItems()
     {
-        return $this->hasMany(SalesInvoice::class);
+        return $this->hasMany(SalesInvoiceItem::class);
     }
 
     public function salesOrderItems()
     {
-        return $this->hasMany(SalesOrder::class);
+        return $this->hasMany(SalesOrderItem::class);
     }
 
 
