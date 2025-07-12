@@ -148,6 +148,12 @@ class ItemService
             'unit_of_measurement' => $item->unit_of_measurement,
             'id_crypt' => $item->id_crypt,
             'category' => $item->category,
+            'active_gst_percent' => $item->activeGstPercent,
+            'active_hsn_code' => $item->activeHsnCode,
+            'active_sac_code' => $item->activeSacCode,
+            'latest_gst_percent' => $item->latestGstPercent,
+            'latest_hsn_code' => $item->latestHsnCode,
+            'latest_sac_code' => $item->latestSacCode,
         ]);
     }
 
@@ -324,7 +330,7 @@ class ItemService
         //             $query->where('vendors.id', $id);
         //         })->get();
         // }
-        return Item::with('activeGstPercent', 'activeHsnCode','activeSacCode', 'category')->latest()->get();
+        return Item::with('activeGstPercent', 'activeHsnCode', 'activeSacCode', 'category')->latest()->get();
     }
 
 
